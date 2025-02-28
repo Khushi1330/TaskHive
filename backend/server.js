@@ -1,27 +1,22 @@
 const express = require("express");
 const cors = require("cors");
-const axios = require("axios");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Test Route
-app.get("/", (req, res) => {
-    res.send("TaskHive Backend is Running 🚀");
-});
+// Import authentication routes
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
 
-// AI Recommendation Route
-app.post("/api/recommend", async (req, res) => {
-    try {
-        const response = await axios.post(process.env.AI_API_URL, req.body);
-        res.json(response.data);
-    } catch (error) {
-        res.status(500).json({ error: "AI API request failed" });
-    }
-});
+// Connect MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("✅ MongoDB Connected Successfully"))
+  .catch(err => console.error("❌ MongoDB Connection Error:", err));
 
-// Start Server
+app.get("/", (req, res) => res.send("TaskHive Backend is Running 🚀"));
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
