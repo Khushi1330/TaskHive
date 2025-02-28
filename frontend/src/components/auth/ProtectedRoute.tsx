@@ -1,26 +1,19 @@
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+// 1. First, update ProtectedRoute.tsx to use UserContext:
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useUser } from "../../context/UserContext";
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, isLoading } = useUser();
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useUser();
   const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-600 dark:border-darkPrimary-500"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Verifying authentication...</p>
-        </div>
-      </div>
-    );
+  // Show loading state while checking authentication
+  if (loading) {
+    return <div>Loading...</div>; // Consider a proper loading component
   }
 
+  // Redirect to login if not authenticated
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }

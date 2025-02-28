@@ -48,8 +48,8 @@ const Overview: React.FC = () => {
   
   // Chart colors
   const primaryColor = isDark ? 'rgb(16, 185, 129)' : 'rgb(22, 163, 74)';
-  const secondaryColor = isDark ? 'rgb(5, 150, 105)' : 'rgb(34, 197, 94)';
-  const tertiaryColor = isDark ? 'rgb(4, 120, 87)' : 'rgb(21, 128, 61)';
+  const inProgressColor = '#155E95'; // Custom dark blue color for in progress
+  const pendingColor = '#D84040'; // Grey color for pending
   const textColor = isDark ? 'rgb(209, 213, 219)' : 'rgb(55, 65, 81)';
   const gridColor = isDark ? 'rgba(75, 85, 99, 0.2)' : 'rgba(209, 213, 219, 0.2)';
   
@@ -78,7 +78,7 @@ const Overview: React.FC = () => {
         },
       },
       tooltip: {
-        mode: 'index' as const, // Fixed: Specify the correct type for tooltip mode
+        mode: 'index' as const,
         intersect: false,
       },
     },
@@ -103,7 +103,7 @@ const Overview: React.FC = () => {
     },
   };
   
-  // Task completion data
+  // Task completion data - Updated colors: completed (green), in progress (dark blue #2D336B), pending (grey)
   const taskCompletionData = {
     labels: ['Completed', 'In Progress', 'Pending'],
     datasets: [
@@ -111,8 +111,8 @@ const Overview: React.FC = () => {
         data: [65, 20, 15],
         backgroundColor: [
           primaryColor,
-          secondaryColor,
-          tertiaryColor,
+          inProgressColor,
+          pendingColor,
         ],
         borderWidth: 0,
       },
@@ -121,15 +121,21 @@ const Overview: React.FC = () => {
   
   const taskCompletionOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'bottom' as const,
         labels: {
           color: textColor,
+          boxWidth: 12,
+          padding: 10,
+          font: {
+            size: 11,
+          },
         },
       },
     },
-    cutout: '70%',
+    cutout: '65%',
   };
   
   // Competition performance data
@@ -351,11 +357,28 @@ const Overview: React.FC = () => {
           className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 lg:col-span-1"
         >
           <h2 className="text-lg font-semibold mb-4">Task Completion</h2>
-          <div className="h-64 flex items-center justify-center">
-            <div className="w-full max-w-xs">
+          {/* Fixed height container with proper sizing */}
+          <div className="h-56 flex items-center justify-center">
+            <div className="w-full h-full">
               <Doughnut data={taskCompletionData} options={taskCompletionOptions} />
             </div>
           </div>
+          
+          {/* Updated legend explanation with circular color indicators */}
+            <div className="mt-3 flex justify-center space-x-4 text-xs">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: primaryColor }}></div>
+                <span>Completed: 65%</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: inProgressColor }}></div>
+                <span>In Progress: 20%</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full mr-1" style={{ backgroundColor: pendingColor }}></div>
+                <span>Pending: 15%</span>
+              </div>
+            </div>
         </motion.div>
         
         <motion.div

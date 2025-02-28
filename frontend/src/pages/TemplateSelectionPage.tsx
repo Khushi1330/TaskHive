@@ -219,24 +219,45 @@ const TemplateSelectionPage: React.FC = () => {
 
   const handleGetStarted = async () => {
     if (!selectedTemplate || !selectedSubfield) return;
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Update user profile with selected template and subfield
-      await updateProfile({
-        selected_template: selectedTemplate.id,
-        selected_subfield: selectedSubfield.id
-      });
-      
-      // Navigate to dashboard
-      navigate('/dashboard');
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("No authentication token found.");
+            navigate("/login");
+            return;
+        }
+
+        const response = await fetch("http://localhost:5000/api/auth/update-profile", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                selected_template: selectedTemplate.id,
+                selected_subfield: selectedSubfield.id,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            console.log("Profile updated successfully:", data);
+            navigate("/dashboard");
+        } else {
+            console.error("Error updating profile:", data.message || "Unknown error");
+        }
     } catch (error) {
-      console.error('Error updating profile:', error);
+        console.error("Error updating profile:", error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
+
+
 
   return (
     <div className="min-h-screen hexagon-grid py-24">

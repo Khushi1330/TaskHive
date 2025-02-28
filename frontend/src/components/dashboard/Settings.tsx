@@ -255,7 +255,7 @@ const Settings: React.FC = () => {
                           id="name"
                           name="name"
                           className="input"
-                          value={formData.name}
+                          value={formData?.name}
                           onChange={handleInputChange}
                           required
                         />
@@ -270,7 +270,7 @@ const Settings: React.FC = () => {
                           id="email"
                           name="email"
                           className="input bg-gray-100 dark:bg-gray-600"
-                          value={formData.email}
+                          value={formData?.email}
                           onChange={handleInputChange}
                           disabled
                         />
@@ -321,9 +321,11 @@ const Settings: React.FC = () => {
                 ) : (
                   <div className="space-y-6">
                     <div className="flex items-center">
-                      <div className="h-20 w-20 rounded-full bg-primary-500 dark:bg-darkPrimary-500 flex items-center justify-center text-white text-2xl mr-6">
-                        {profile?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
-                      </div>
+                    <div className="h-8 w-8 rounded-full bg-primary-500 dark:bg-darkPrimary-500 flex items-center justify-center text-white">
+                      {profile?.name?.charAt(0) ||
+                       (typeof user?.email === "string" ? user.email.charAt(0) : "U")}
+                    </div>
+
                       <div>
                         <h3 className="text-xl font-semibold">{profile?.name || 'User'}</h3>
                         <p className="text-gray-600 dark:text-gray-400">{user?.email}</p>
@@ -392,7 +394,7 @@ const Settings: React.FC = () => {
                           id="currentPassword"
                           name="currentPassword"
                           className="input"
-                          value={formData.currentPassword}
+                          value={formData?.currentPassword}
                           onChange={handleInputChange}
                           required
                         />
@@ -407,7 +409,7 @@ const Settings: React.FC = () => {
                           id="newPassword"
                           name="newPassword"
                           className="input"
-                          value={formData.newPassword}
+                          value={formData?.newPassword}
                           onChange={handleInputChange}
                           required
                         />
@@ -422,7 +424,7 @@ const Settings: React.FC = () => {
                           id="confirmPassword"
                           name="confirmPassword"
                           className="input"
-                          value={formData.confirmPassword}
+                          value={formData?.confirmPassword}
                           onChange={handleInputChange}
                           required
                         />
@@ -474,7 +476,7 @@ const Settings: React.FC = () => {
                         type="checkbox"
                         name="emailNotifications"
                         className="sr-only peer"
-                        checked={formData.emailNotifications}
+                        checked={formData?.emailNotifications}
                         onChange={handleInputChange}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-darkPrimary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600 dark:peer-checked:bg-darkPrimary-600"></div>
@@ -493,7 +495,7 @@ const Settings: React.FC = () => {
                         type="checkbox"
                         name="pushNotifications"
                         className="sr-only peer"
-                        checked={formData.pushNotifications}
+                        checked={formData?.pushNotifications}
                         onChange={handleInputChange}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-darkPrimary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600 dark:peer-checked:bg-darkPrimary-600"></div>
@@ -574,7 +576,7 @@ const Settings: React.FC = () => {
                         type="checkbox"
                         name="darkMode"
                         className="sr-only peer"
-                        checked={formData.darkMode}
+                        checked={formData?.darkMode}
                         onChange={handleToggleDarkMode}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 dark:peer-focus:ring-darkPrimary-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary-600 dark:peer-checked:bg-darkPrimary-600"></div>
@@ -596,7 +598,7 @@ const Settings: React.FC = () => {
                     id="language"
                     name="language"
                     className="input"
-                    value={formData.language}
+                    value={formData?.language}
                     onChange={handleInputChange}
                   >
                     <option value="en">English</option>

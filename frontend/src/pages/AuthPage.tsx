@@ -1,3 +1,5 @@
+// 3. Update AuthPage to fix the authentication flow:
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -8,27 +10,64 @@ import { useUser } from '../context/UserContext';
 const AuthPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn, user } = useUser(); // ✅ Kept signIn for authentication
+  const { signIn, user, loading } = useUser();
   const [isSignUp, setIsSignUp] = useState(false);
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setIsSignUp(params.get('signup') === 'true');
   }, [location]);
 
+  // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
+    if (user && !loading) {
       const from = location.state?.from?.pathname || '/templates';
       navigate(from, { replace: true });
     }
-  }, [user, navigate, location.state]);
+  }, [user, loading, navigate, location.state]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    signIn(email); // ✅ Set user before navigating
-    navigate('/templates'); // ✅ Redirect to Template Selection Page
+    setError('');
+    setIsSubmitting(true);
+  
+    const requestBody = isSignUp ? { fullName, email, password } : { email, password };
+  
+    try {
+      const response = await fetch(`http://localhost:5000/api/auth/${isSignUp ? "register" : "login"}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+  
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || "Authentication failed");
+      }
+  
+      if (isSignUp) {
+        // If registration successful, switch to login
+        setIsSignUp(false);
+        setIsSubmitting(false);
+        return;
+      }
+  
+      // Store token and user data
+      localStorage.setItem("token", data.token);
+      signIn(data.user);
+      navigate("/templates");
+    } catch (error) {
+      console.error("Authentication failed:", error);
+      setError(error instanceof Error ? error.message : "Authentication failed");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -49,12 +88,18 @@ const AuthPage: React.FC = () => {
                 <Logo className="h-8 w-8" />
                 <span className="ml-2 text-xl font-bold">Task Hive</span>
               </div>
-              <div className="w-5"></div> {/* Empty div for flex alignment */}
+              <div className="w-5"></div>
             </div>
 
             <h2 className="text-2xl font-bold text-center mb-6">
               {isSignUp ? 'Create an Account' : 'Welcome Back'}
             </h2>
+
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm">
+                {error}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               {isSignUp && (
@@ -73,6 +118,8 @@ const AuthPage: React.FC = () => {
                       required
                       className="input pl-10"
                       placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                     />
                   </div>
                 </div>
@@ -123,8 +170,14 @@ const AuthPage: React.FC = () => {
               <button
                 type="submit"
                 className="btn-primary w-full mb-4"
+                disabled={isSubmitting}
               >
-                {isSignUp ? 'Create Account' : 'Sign In'}
+                {isSubmitting 
+                  ? 'Processing...' 
+                  : isSignUp 
+                    ? 'Create Account' 
+                    : 'Sign In'
+                }
               </button>
 
               <div className="relative flex items-center justify-center mb-4">
