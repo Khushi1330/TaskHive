@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
@@ -7,25 +7,25 @@ const steps = [
     number: '01',
     title: 'Sign Up & Select a Template',
     description: 'Create an account and choose a goal template that aligns with your interests and career aspirations.',
-    image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80',
+    video: './Template.mp4',
   },
   {
     number: '02',
     title: 'Complete Daily Tasks',
     description: 'Work on assigned tasks from teachers and the community to earn points and build your skills.',
-    image: 'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80',
+    video: './Task.mp4',
   },
   {
     number: '03',
     title: 'Participate in Competitions',
     description: 'Join competitions based on your badge level to showcase your skills and win rewards.',
-    image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80',
+    video: './Competition.mp4',
   },
   {
     number: '04',
     title: 'Level Up & Mentor Others',
     description: 'Earn badges, unlock advanced features, and eventually become a mentor to help others grow.',
-    image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80',
+    video: './Mentorship.mp4',
   },
 ];
 
@@ -49,7 +49,7 @@ const HowItWorks: React.FC = () => {
               number={step.number}
               title={step.title}
               description={step.description}
-              image={step.image}
+              video={step.video}
               isReversed={index % 2 !== 0}
             />
           ))}
@@ -63,15 +63,29 @@ interface StepProps {
   number: string;
   title: string;
   description: string;
-  image: string;
+  video: string;
   isReversed: boolean;
 }
 
-const Step: React.FC<StepProps> = ({ number, title, description, image, isReversed }) => {
+const Step: React.FC<StepProps> = ({ number, title, description, video, isReversed }) => {
   const [ref, inView] = useInView({
-    triggerOnce: true,
+    triggerOnce: false,
     threshold: 0.1,
   });
+  
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Start playing video when it comes into view
+  useEffect(() => {
+    if (inView && videoRef.current) {
+      videoRef.current.play().catch(error => {
+        console.log("Autoplay prevented:", error);
+        // Some browsers prevent autoplay, this is a fallback
+      });
+    } else if (!inView && videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [inView]);
 
   return (
     <motion.div
@@ -88,10 +102,15 @@ const Step: React.FC<StepProps> = ({ number, title, description, image, isRevers
           animate={inView ? { scale: 1 } : { scale: 0.9 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <img
-            src={image}
-            alt={title}
+          <video
+            ref={videoRef}
+            src={video}
             className="w-full h-64 md:h-80 object-cover transform hover:scale-105 transition-transform duration-500"
+            loop
+            muted
+            playsInline
+            autoPlay
+            controls={false}
           />
         </motion.div>
       </div>
