@@ -13,10 +13,10 @@ app.use("/api/auth", authRoutes);
 
 // Connect MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("✅ MongoDB Connected Successfully"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
+  .then(() => console.log("MongoDB Connected Successfully"))
+  .catch(err => console.error("MongoDB Connection Error:", err));
 
-app.get("/", (req, res) => res.send("TaskHive Backend is Running 🚀"));
+app.get("/", (req, res) => res.send("TaskHive Backend is Running"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
